@@ -1,0 +1,47 @@
+void Kruskal(Graphe* graphe) {
+    int ordre = graphe->ordre;
+    pArc *tab_arc = (pArc *) malloc(sizeof(pArc) * graphe->taille);
+    int *deja_vu = (int *) malloc(ordre * sizeof(int));
+    int compteur =0;
+    int poids_total=0;
+
+    //initialise le tableau de deja vu
+    for (int i = 0; i < ordre; i++) {
+        deja_vu[i] = i;//l'initialisation est ici arbitraire (elle coorespondra par la suite si le sommet est dej avu ou non)
+    }
+
+
+    // Parcourir de tous sommets et arrêtes du graphe
+    for (int i = 0; i < ordre; i++) {
+        pArc arc = graphe->pSommet[i]->arc;
+        while (arc != NULL) {
+            int voisin = arc->sommet;
+            int poids = arc->valeur;
+
+            // Vérifier si l'arrête qui est non orienté est déja dans le tableau ou pas
+            int est_deja_ajoute = 0;
+            for (int j = 0; j < compteur; j++) {
+                if ((tab_arc[j]->sommet == i && tab_arc[j]->arc_suivant->sommet == voisin) ||
+                    (tab_arc[j]->sommet == voisin && tab_arc[j]->arc_suivant->sommet == i)) {
+                    est_deja_ajoute = 1;
+                    break;
+                }
+            }
+
+            // Si l'arrête n'est pas dans le tableau alors on l'ajoute
+            if (!est_deja_ajoute) {
+                tab_arc[compteur] = (pArc)malloc(sizeof(struct Arc));
+                tab_arc[compteur]->sommet = i;
+                tab_arc[compteur]->arc_suivant = (pArc)malloc(sizeof(struct Arc));
+                tab_arc[compteur]->arc_suivant->sommet = voisin;
+                tab_arc[compteur]->arc_suivant->valeur = poids;
+                tab_arc[compteur]->arc_suivant->arc_suivant = NULL;
+                tab_arc[compteur]->valeur = poids;
+
+                compteur++;//qui permet de parcourir toutes les arrêtes et les ajouter ou non au tableau (à la fin de l'algo le compteur est égal au nombre d'arrêtes)
+            }
+
+            // Pour passer à l'arrête suivante dans le graphe
+            arc = arc->arc_suivant;
+        }
+    }
