@@ -1,0 +1,24 @@
+    //ajouter les bonnes arrêtes et former le graphe en utilisant un tableau de sommet deja vu pour ne pas créer de cycle
+    printf("arbre obtenu grâce a Kruskal : \n");
+    for (int i = 0; i < compteur; i++) {
+        int sommet_1 = tab_arc[i]->sommet;
+        int sommet_2 = (tab_arc[i]->arc_suivant != NULL) ? tab_arc[i]->arc_suivant->sommet : -1; //pour etre sur que l'arc est bien défini
+        int poids = tab_arc[i]->valeur;
+
+        //voir si les deux sommets ont été deja vu ou pas
+        int deja_vu_sommet1 = deja_vu[sommet_1];
+        int deja_vu_sommet2 = deja_vu[sommet_2];
+
+        //Si le sommet 1 et 2 ont deja été vu alors on passe a une autre arrete sinon on l'jaoute
+        if (deja_vu_sommet1 !=deja_vu_sommet2) {
+            printf("%d--%d Poids: %d\n", sommet_1, sommet_2, poids);
+            poids_total+=poids;
+
+            //mise a jour du tableau de deja vu
+            for (int j = 0; j < ordre; j++) {
+                if (deja_vu[j] == deja_vu_sommet2) {
+                    deja_vu[j] = deja_vu_sommet1;
+                }//cela permet d'ajouter uniquement les arrêtes voulu et qu'elle ne puisse pas former de cycle
+            }
+        }
+    }
