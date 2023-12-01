@@ -1,0 +1,14 @@
+// créer le graphe
+Graphe* CreerGraphe(int ordre)
+{
+    Graphe * Newgraphe=(Graphe*)malloc(sizeof(Graphe));
+    Newgraphe->pSommet = (pSommet*)malloc(ordre*sizeof(pSommet));
+
+    for(int i=0; i<ordre; i++)
+    {
+        Newgraphe->pSommet[i]=(pSommet)malloc(sizeof(struct Sommet));
+        Newgraphe->pSommet[i]->valeur=i;
+        Newgraphe->pSommet[i]->arc=NULL;
+    }
+    return Newgraphe;
+}
