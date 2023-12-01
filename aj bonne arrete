@@ -22,3 +22,5 @@
             }
         }
     }
+}
+ printf("Le poids total minimum du graphe est %d\n",poids_total);
