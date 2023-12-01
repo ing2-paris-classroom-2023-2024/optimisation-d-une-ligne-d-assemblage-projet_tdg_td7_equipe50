@@ -1,0 +1,16 @@
+/*affichage du graphe avec les successeurs de chaque sommet */
+void graphe_afficher(Graphe* graphe)
+{
+    printf("graphe\n");
+
+    printf("ordre = %d\n",graphe->ordre);
+
+    printf("listes d'adjacence :\n");
+
+    for (int i=0; i<graphe->ordre; i++)
+    {
+        afficher_successeurs(graphe->pSommet, i);
+        printf("\n");
+    }
+
+}
