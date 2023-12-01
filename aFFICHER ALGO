@@ -1,0 +1,13 @@
+    // Afficher l'arbre de l'algo de Prim
+    printf("Arbre obtenu grâce à Prim :\n");
+    for (int i = 1; i < ordre; i++) {
+        printf("%d--%d Poids: %d\n", predecesseur[i], i, distance[i]);
+        poids_total+=distance[i];
+    }
+    printf("Le poids total minimum du graphe est %d\n",poids_total);
+
+    // Libérer l'espace mémoire alloué
+    free(deja_vu);
+    free(distance);
+    free(predecesseur);
+}
