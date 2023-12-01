@@ -1,0 +1,27 @@
+int main() {
+    Graphe * g;
+
+    char nom_fichier[50];
+
+    printf("entrer le nom du fichier du labyrinthe:");
+    gets(nom_fichier);
+
+    g = lire_graphe(nom_fichier);
+
+    /// afficher le graphe
+    graphe_afficher(g);
+
+    //demander a l'utilisateur le chemin de départ et d'arrivée
+    int sommet_dep=0;
+    int sommet_arr=0;
+
+    printf("choisissez le sommet de départ : ");
+    scanf("%d",&sommet_dep);
+    printf("\nchoississez le sommet d'arrivée : ");
+    scanf("%d",&sommet_arr);
+    printf(("\n"));
+
+    Dijkstra(g,sommet_dep,sommet_arr);
+
+    return 0;
+}
