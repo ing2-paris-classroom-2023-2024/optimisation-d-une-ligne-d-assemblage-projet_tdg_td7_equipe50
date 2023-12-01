@@ -1,0 +1,69 @@
+//algorithme Dijkstra, grâce à la stucture créer dans le graphe.h
+void Dijkstra(Graphe *graphe,int sommet_ini,int sommet_fin) {
+    int *distance = (int *) malloc(sizeof(int) * graphe->ordre);
+    int *predecesseur = (int *) malloc(sizeof(int) * graphe->ordre);
+    int *deja_vu = (int *) malloc(sizeof(int) * graphe->ordre);//pour les sommets deja vu dans l'algorithme
+
+    //initialisation des distances et predecesseurs
+    for (int (i) = 0; (i) < graphe->ordre; ++(i)) {
+        distance[i] = 2147483647;
+        predecesseur[i] = -1;
+        deja_vu[i] = 0;
+    }
+    distance[sommet_ini] = 0;//nous n'avons pas de boucle donc la distance est 0
+
+    for (int i = 0; i < graphe->ordre; i++) {
+        int min_distance = 2147483647;//entier max pour eviter que la distance soit supérieur a celle ci
+        int sommet_choisi = -1;
+
+        //trouver le sommet non deja vu avec la plus petite distance
+        for (int j = 0; j < graphe->ordre; j++) {
+            if (!deja_vu[j] && distance[j] < min_distance) {
+                sommet_choisi = j;
+                min_distance = distance[j];
+            }
+        }
+        if (sommet_choisi == -1) {
+            break;
+        }//sorti car tous les sommets serait dans deja vu
+
+        deja_vu[sommet_choisi] = 1;
+
+        //mettre a jour distance et predecessuer
+        pArc arc = graphe->pSommet[sommet_choisi]->arc;
+        while (arc != NULL) {
+            int v = arc->sommet;
+            int poids = arc->valeur;
+            if (!deja_vu[v] && distance[sommet_choisi] != 2147483647 && distance[sommet_choisi] + poids < distance[v]) {
+                distance[v] = distance[sommet_choisi] + poids;
+                predecesseur[v] = sommet_choisi;
+            }//vérifie que c'est bien le chemin le plus court et change les bonnes valeur de distance et predesseceur
+            arc = arc->arc_suivant;
+        }
+    }
+
+    //afficher la distance et les predecesseurs de chaque sommet de tout le graphe
+    /*printf("Sommets\tDistance\tPredesseceurs\n");
+    for (int i = 0; i < graphe->ordre; i++) {
+        printf("%d\t\t%d\t\t\t", i, distance[i]);
+        if (predecesseur[i] != -1) {
+            printf("%d", predecesseur[i]);
+        } else {
+            printf("-");
+        }
+        printf("\n");
+    }*/
+
+
+    //affichier uniquement la distance et le chemin du sommet final chosi
+    printf(("entre le sommet %d et %d, le plus cours chemin est de longeur %d et ils passent par les sommets : %d "),sommet_ini,sommet_fin,distance[sommet_fin],sommet_fin);
+    printf("- %d ",predecesseur[sommet_fin]);
+    int chemin =predecesseur[sommet_fin];
+    do {
+        printf("- %d ",predecesseur[chemin]);
+        chemin=predecesseur[chemin];
+    }while(chemin!=sommet_ini);
+
+    printf("\n");
+
+}
