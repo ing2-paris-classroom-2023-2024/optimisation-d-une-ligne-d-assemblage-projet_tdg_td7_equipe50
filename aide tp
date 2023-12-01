@@ -1,0 +1,45 @@
+void Prim(Graphe* graphe) {
+    int ordre = graphe->ordre;
+    int poids_total=0;
+    int* deja_vu = (int*)malloc(ordre * sizeof(int));
+    int* distance = (int*)malloc(ordre * sizeof(int));
+    int* predecesseur = (int*)malloc(ordre * sizeof(int));
+
+    // Initialiser les distances à l'infini et les prédecesseurs à -1
+    for (int i = 0; i < ordre; i++) {
+        deja_vu[i] = 0;
+        distance[i] = 32767;//choisi de manière arbitraire car on sait que aucun poids ne va être au dessus de cette valeur
+        predecesseur[i] = -1;
+    }
+
+    // Choix du sommet de départ ici 0 par exemple (mais il peut être possible de demandé par la suite à l'utilisateur de le chosir)
+    int sommet_chosi = 0;
+    distance[sommet_chosi] = 0;
+
+
+    for (int i = 0; i < ordre - 1; i++) {
+        // Mettre le sommet choisi a 1 pour ne plus les réutiliser
+        deja_vu[sommet_chosi] = 1;
+
+        // Mettre à jour les distances et prédecesseurs pour les sommets adjacents
+        pArc arc = graphe->pSommet[sommet_chosi]->arc;
+        while (arc != NULL) {
+            int voisin = arc->sommet;
+            int poids = arc->valeur;
+            if (!deja_vu[voisin] && poids < distance[voisin]) {
+                distance[voisin] = poids;
+                predecesseur[voisin] = sommet_chosi;
+            }
+            arc = arc->arc_suivant;
+        }
+
+        // Trouver le prochain sommet à inclure dans l'arbre couvrant
+        sommet_chosi = -1;
+        int distance_mini = 32767;//choisi de manière arbitraire
+        for (int j = 0; j < ordre; j++) {
+            if (!deja_vu[j] && distance[j] < distance_mini) {
+                sommet_chosi = j;
+                distance_mini = distance[j];
+            }
+        }
+    }
