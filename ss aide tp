@@ -1,0 +1,47 @@
+int main() {
+    Graphe * g;
+
+    char nom_fichier[50];
+
+    printf("entrer le nom du fichier du labyrinthe:");//le nom est 'graphe.txt'
+    gets(nom_fichier);
+
+    g = lire_graphe(nom_fichier);
+
+    /// afficher le graphe
+    graphe_afficher(g);
+
+    printf("\n");
+    char algo_Kruskal;
+    char algo_Prim;
+    printf("veut tu utiliser l'algorithme de Kruskal (y/n): ");
+    scanf("%c",&algo_Kruskal);
+    printf("\n");
+    if (algo_Kruskal=='y'){//si la reponse est différente de y alors cela ne va pas marcher
+        Kruskal(g);
+        printf("\n");
+    }//demande si on doit utiliser l'algo de Kruskal et l'afficher ou non
+
+    printf("veut-tu utiliser l'algorithme de Prim (y/n): ");
+    scanf(" %c",&algo_Prim);
+    printf("\n");
+    if (algo_Prim=='y'){//si la réponse est différente de y cela ne va pas marcher
+        Prim(g);
+        printf("\n");
+    }//demande si on veut utiliser l'algorithme de Pri et on l'affiche ou non
+
+    // Libérer l'espace mémoire alloué pour le graphe
+    for (int i = 0; i < g->ordre; i++) {
+        pArc arc = g->pSommet[i]->arc;
+        while (arc != NULL) {
+            pArc temp = arc;
+            arc = arc->arc_suivant;
+            free(temp);
+        }
+        free(g->pSommet[i]);
+    }
+    free(g->pSommet);
+    free(g);
+
+    return 0;
+}
