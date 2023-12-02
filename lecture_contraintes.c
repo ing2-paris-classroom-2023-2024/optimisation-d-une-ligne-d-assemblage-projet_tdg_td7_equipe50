@@ -3,6 +3,17 @@
 //
 #include "lecture_contraintes.h"
 
+int lecture_temps(char* fichier){
+    FILE * ifs = fopen(fichier, "r");
+    if(!ifs){
+        printf("erreur ouverture fichier temps");
+        exit(EXIT_FAILURE);
+    }
+    int temps_total = 0;
+    fscanf(ifs, "%d", &temps_total);
+    return temps_total;
+}
+
 t_operation *creer_operation(int num, float temps){
     t_operation *nouvelle_operation;
     nouvelle_operation = (t_operation *)malloc(sizeof(t_operation));
