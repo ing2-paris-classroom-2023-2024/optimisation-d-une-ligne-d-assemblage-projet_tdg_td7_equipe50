@@ -12,8 +12,11 @@ int main(){
     printf("Entrez le nom du fichier: ");
     fgets(nomFichier, sizeof(nomFichier), stdin);
     nomFichier[strcspn(nomFichier, "\n")] = 0;
-    int nmb_lignes;
+    int nmb_lignes = 0;
     t_operation **operations = lire_operations(nomFichier, &nmb_lignes);
+    for(int i = 0; i<nmb_lignes; i++){
+        operations[i]->rang = i;
+    }
     for(int i = 0; i<nmb_lignes; i++){
         printf("%d %f\n", operations[i]->num, operations[i]->temps);
     }

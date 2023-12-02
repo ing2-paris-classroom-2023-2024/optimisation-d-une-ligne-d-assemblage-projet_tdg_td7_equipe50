@@ -14,16 +14,13 @@ typedef struct Operation{
     int rang;//le rang défini apres quelles operations on peut effectuer l'operation
 }t_operation;
 
-typedef struct Station{
-    int nmb_operations;
-    t_operation *operations;
-}t_station;
-
 int compter_nombre_operations(FILE * fichier);
 
 t_operation *creer_operation(int num, float temps);
 
 t_operation **lire_operations(char *NomFichier, int *nmb_lignes);
+
+int lecture_temps(char* fichier);
 
 
 #endif //OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_PROJET_TDG_TD7_EQUIPE50_LECTURE_CONTRAINTES_H

@@ -8,4 +8,6 @@ add_executable(optimisation_d_une_ligne_d_assemblage_projet_tdg_td7_equipe50
         lecture_contraintes.h
         lecture_contraintes.c
         graphe.h
-        graphe.c)
+        graphe.c
+        Stations.h
+        Stations.c)
