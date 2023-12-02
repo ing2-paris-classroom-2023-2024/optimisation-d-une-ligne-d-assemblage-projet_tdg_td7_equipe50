@@ -1,134 +1,99 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_TASKS 100
-
-// Structure pour représenter un nœud du graphe
 typedef struct Node {
-    int task;
+    int value;
     struct Node* next;
 } Node;
 
-// Structure pour représenter le graphe
-typedef struct Graph {
-    int numTasks;
-    Node** adjacencyList;
-    int* inDegree;  // Nombre d'arêtes entrantes pour chaque nœud
+typedef struct {
+    Node** array;
+    int size;
 } Graph;
 
-// Fonction pour initialiser un nœud
-Node* createNode(int task) {
+Node* createNode(int value) {
     Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->task = task;
+    newNode->value = value;
     newNode->next = NULL;
     return newNode;
 }
 
-// Fonction pour initialiser le graphe
-Graph* initGraph(int numTasks) {
+Graph* createGraph(int size) {
     Graph* graph = (Graph*)malloc(sizeof(Graph));
-    graph->numTasks = numTasks;
-    graph->adjacencyList = (Node**)malloc(numTasks * sizeof(Node*));
-    graph->inDegree = (int*)calloc(numTasks, sizeof(int));
-
-    for (int i = 0; i < numTasks; ++i) {
-        graph->adjacencyList[i] = NULL;
+    graph->size = size;
+    graph->array = (Node*)malloc(size * sizeof(Node));
+    for (int i = 0; i < size; ++i) {
+        graph->array[i] = NULL;
     }
-
     return graph;
 }
 
-// Fonction pour ajouter une arête au graphe
-void addEdge(Graph* graph, int fromTask, int toTask) {
-    Node* newNode = createNode(toTask);
-    newNode->next = graph->adjacencyList[fromTask];
-    graph->adjacencyList[fromTask] = newNode;
-    graph->inDegree[toTask]++;
+void addEdge(Graph* graph, int src, int dest) {
+    Node* newNode = createNode(dest);
+    newNode->next = graph->array[src];
+    graph->array[src] = newNode;
 }
 
-// Fonction pour tri topologique
-void topologicalSort(Graph* graph) {
-    int* result = (int*)malloc(graph->numTasks * sizeof(int));
-    int resultIndex = 0;
+void topologicalSortUtil(Graph* graph, int v, int visited[], int stack[], int* stackIndex) {
+    visited[v] = 1;
 
-    // Initialiser une file pour les nœuds avec un degré entrant de 0
-    int* queue = (int*)malloc(graph->numTasks * sizeof(int));
-    int front = 0, rear = 0;
+    Node* current = graph->array[v];
+    while (current != NULL) {
+        int adj = current->value;
+        if (!visited[adj]) {
+            topologicalSortUtil(graph, adj, visited, stack, stackIndex);
+        }
+        current = current->next;
+    }
 
-    // Ajouter les nœuds avec un degré entrant de 0 à la file
-    for (int i = 0; i < graph->numTasks; ++i) {
-        if (graph->inDegree[i] == 0) {
-            queue[rear++] = i;
+    stack[(*stackIndex)++] = v;
+}
+
+void precedenceSort(Graph* graph) {
+    int* visited = (int*)malloc(graph->size * sizeof(int));
+    int* stack = (int*)malloc(graph->size * sizeof(int));
+    int stackIndex = 0;
+
+    for (int i = 0; i < graph->size; ++i) {
+        visited[i] = 0;
+    }
+
+    for (int i = 0; i < graph->size; ++i) {
+        if (!visited[i]) {
+            topologicalSortUtil(graph, i, visited, stack, &stackIndex);
         }
     }
 
-    // Appliquer le tri topologique
-    while (front < rear) {
-        int currentTask = queue[front++];
-        result[resultIndex++] = currentTask;
-
-        // Réduire le degré entrant des voisins
-        for (Node* neighbor = graph->adjacencyList[currentTask]; neighbor != NULL; neighbor = neighbor->next) {
-            graph->inDegree[neighbor->task]--;
-            if (graph->inDegree[neighbor->task] == 0) {
-                queue[rear++] = neighbor->task;
-            }
-        }
+    printf("Ordre de precedence : ");
+    for (int i = stackIndex - 1; i >= 0; --i) {
+        printf("%d ", stack[i]);
     }
 
-    // Vérifier s'il y a un cycle (si tous les nœuds n'ont pas été inclus dans le tri topologique)
-    if (resultIndex != graph->numTasks) {
-        printf("Le graphe a un cycle. Il n'est pas possible de déterminer un ordre valide.\n");
-        free(result);
-        free(queue);
-        return;
-    }
-
-    // Afficher l'ordre des opérations
-    printf("Ordre des opérations (rangs) :\n");
-    for (int i = 0; i < graph->numTasks; ++i) {
-        printf("Opération %d : Rang %d\n", result[i] + 1, i + 1);
-    }
-
-    // Libérer la mémoire
-    free(result);
-    free(queue);
+    free(visited);
+    free(stack);
 }
 
-int main() {
-    FILE* file = fopen("contraintes_precedence.txt", "r");
-    if (!file) {
-        perror("Erreur lors de l'ouverture du fichier");
-        return 1;
+void readEdgesFromFile(Graph* graph, const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Erreur lors de l'ouverture du fichier %s.\n", filename);
+        exit(EXIT_FAILURE);
     }
 
-    int numTasks;
-    fscanf(file, "%d", &numTasks);
-
-    Graph* graph = initGraph(numTasks);
-
-    int fromTask, toTask;
-    while (fscanf(file, "%d %d", &fromTask, &toTask) == 2) {
-        addEdge(graph, fromTask - 1, toTask - 1);
+    int src, dest;
+    while (fscanf(file, "%d %d", &src, &dest) == 2) {
+        addEdge(graph, src, dest);
     }
 
     fclose(file);
+}
 
-    // Appliquer le tri topologique et afficher les rangs
-    topologicalSort(graph);
+void precedences() {
+    Graph* graph = createGraph(36);
 
-    // Libérer la mémoire
-    for (int i = 0; i < numTasks; ++i) {
-        Node* current = graph->adjacencyList[i];
-        while (current != NULL) {
-            Node* next = current->next;
-            free(current);
-            current = next;
-        }
-    }
-    free(graph->adjacencyList);
-    free(graph->inDegree);
-    free(graph);
+    // Lire les arêtes depuis le fichier texte
+    readEdgesFromFile(graph, "precedences.txt");
 
-    return 0;
+    // Effectuer le tri topologique
+    precedenceSort(graph);
 }
