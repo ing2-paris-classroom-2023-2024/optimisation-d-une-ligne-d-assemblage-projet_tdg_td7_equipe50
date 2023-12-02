@@ -30,18 +30,18 @@ void ajouterArete(Graphe* graphe, int source, int destination) {
     graphe->listeAdjacence[source] = nouveauNoeud;
 }
 
-void afficherGraphe(Graphe* graphe) {
+void libererGraphe(Graphe* graphe) {
     for (int i = 0; i < graphe->nombreNoeuds; ++i) {
         Noeud* noeudCourant = graphe->listeAdjacence[i];
-        printf("Noeud %d:", i);
-
         while (noeudCourant != NULL) {
-            printf(" -> %d", noeudCourant->valeur);
-            noeudCourant = noeudCourant->suivant;
+            Noeud* noeudSuivant = noeudCourant->suivant;
+            free(noeudCourant);
+            noeudCourant = noeudSuivant;
         }
-
-        printf("\n");
     }
+
+    free(graphe->listeAdjacence);
+    free(graphe);
 }
 
 int trouverNombreNoeuds(FILE* fichier) {
@@ -58,6 +58,48 @@ int trouverNombreNoeuds(FILE* fichier) {
     }
 
     return maxNoeud + 1;  // Ajouter 1 car les nœuds sont numérotés à partir de 0
+}
+
+
+void triTopologiqueRecursif(Graphe* graphe, int sommet, int* visite, int* rang, int* dernierRang) {
+    visite[sommet] = 1;
+
+    Noeud* voisin = graphe->listeAdjacence[sommet];
+    while (voisin != NULL) {
+        if (!visite[voisin->valeur]) {
+            triTopologiqueRecursif(graphe, voisin->valeur, visite, rang, dernierRang);
+        }
+        voisin = voisin->suivant;
+    }
+
+    rang[sommet] = (*dernierRang)--;
+}
+
+void triTopologique(Graphe* graphe, int* rang) {
+    int* visite = (int*)calloc(graphe->nombreNoeuds, sizeof(int));
+    int dernierRang = graphe->nombreNoeuds;
+
+    for (int i = 0; i < graphe->nombreNoeuds; ++i) {
+        if (!visite[i]) {
+            triTopologiqueRecursif(graphe, i, visite, rang, &dernierRang);
+        }
+    }
+
+    free(visite);
+}
+
+void afficherGraphe(Graphe* graphe,int *rang) {
+    for (int i = 1; i < graphe->nombreNoeuds; ++i) {
+        Noeud* noeudCourant = graphe->listeAdjacence[i];
+        printf("Noeud %d:", i);
+
+        while (noeudCourant != NULL) {
+            printf(" -> %d", noeudCourant->valeur);
+            noeudCourant = noeudCourant->suivant;
+        }
+        printf("    /Rang %d",rang[i]);
+        printf("\n");
+    }
 }
 
 int main() {
@@ -82,9 +124,14 @@ int main() {
 
     fclose(fichier);
 
-    afficherGraphe(graphe);
+    int* rang = (int*)malloc(nombreTotalNoeuds * sizeof(int));
+    triTopologique(graphe, rang);
 
-    free(graphe);
+    // Afficher le rang de chaque opération
+    afficherGraphe(graphe,rang);
+
+    free(rang);
+    libererGraphe(graphe);
 
     return 0;
 }
