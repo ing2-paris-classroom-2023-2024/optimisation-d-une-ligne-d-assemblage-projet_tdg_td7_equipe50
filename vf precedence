@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud* suivant;
+} Noeud;
+
+typedef struct {
+    int nombreNoeuds;
+    Noeud** listeAdjacence;
+} Graphe;
+
+Graphe* initialiserGraphe(int nombreNoeuds) {
+    Graphe* graphe = (Graphe*)malloc(sizeof(Graphe));
+    graphe->nombreNoeuds = nombreNoeuds;
+    graphe->listeAdjacence = (Noeud**)malloc(nombreNoeuds * sizeof(Noeud*));
+
+    for (int i = 0; i < nombreNoeuds; ++i) {
+        graphe->listeAdjacence[i] = NULL;
+    }
+
+    return graphe;
+}
+
+void ajouterArete(Graphe* graphe, int source, int destination) {
+    Noeud* nouveauNoeud = (Noeud*)malloc(sizeof(Noeud));
+    nouveauNoeud->valeur = destination;
+    nouveauNoeud->suivant = graphe->listeAdjacence[source];
+    graphe->listeAdjacence[source] = nouveauNoeud;
+}
+
+void afficherGraphe(Graphe* graphe) {
+    for (int i = 0; i < graphe->nombreNoeuds; ++i) {
+        Noeud* noeudCourant = graphe->listeAdjacence[i];
+        printf("Noeud %d:", i);
+
+        while (noeudCourant != NULL) {
+            printf(" -> %d", noeudCourant->valeur);
+            noeudCourant = noeudCourant->suivant;
+        }
+
+        printf("\n");
+    }
+}
+
+int trouverNombreNoeuds(FILE* fichier) {
+    int source, destination;
+    int maxNoeud = 0;
+
+    while (fscanf(fichier, "%d %d", &source, &destination) == 2) {
+        if (source > maxNoeud) {
+            maxNoeud = source;
+        }
+        if (destination > maxNoeud) {
+            maxNoeud = destination;
+        }
+    }
+
+    return maxNoeud + 1;  // Ajouter 1 car les nœuds sont numérotés à partir de 0
+}
+
+int main() {
+    FILE *fichier = fopen("precedences.txt", "r");
+
+    if (fichier == NULL) {
+        fprintf(stderr, "Impossible d'ouvrir le fichier.\n");
+        return 1;
+    }
+
+    int nombreTotalNoeuds = trouverNombreNoeuds(fichier);
+
+    // Réinitialiser le curseur du fichier pour lire à partir du début
+    fseek(fichier, 0, SEEK_SET);
+
+    Graphe* graphe = initialiserGraphe(nombreTotalNoeuds);
+
+    int source, destination;
+    while (fscanf(fichier, "%d %d", &source, &destination) == 2) {
+        ajouterArete(graphe, source, destination);
+    }
+
+    fclose(fichier);
+
+    afficherGraphe(graphe);
+
+    free(graphe);
+
+    
