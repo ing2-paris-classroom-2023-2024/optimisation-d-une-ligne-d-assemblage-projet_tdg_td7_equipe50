@@ -3,6 +3,8 @@
 //
 
 #include "graphe.h"
+#include "file.h"
+#include "lecture_contraintes.h"
 
 /* affichage des successeurs du sommet num*/
 void afficher_successeurs(pSommet * sommet, int num)
@@ -77,11 +79,11 @@ Graphe* CreerGraphe(int ordre)
 
 /* La construction du réseau peut se faire à partir d'un fichier dont le nom est passé en paramètre
 Le fichier contient : ordre, taille,orientation (0 ou 1)et liste des arcs */
-Graphe * lire_graphe(char * nomFichier)
+Graphe * lire_graphe(char * nomFichier, int nmb_operations, int taille)
 {
     Graphe* graphe;
     FILE * ifs = fopen(nomFichier,"r");
-    int taille, orientation, ordre, s1, s2;
+    int orientation, s1, s2;
 
     if (!ifs)
     {
@@ -89,15 +91,12 @@ Graphe * lire_graphe(char * nomFichier)
         exit(-1);
     }
 
-    fscanf(ifs,"%d",&ordre);
 
-    graphe=CreerGraphe(ordre); // créer le graphe d'ordre sommets
+    graphe=CreerGraphe(nmb_operations); // créer le graphe d'ordre sommets
 
-    fscanf(ifs,"%d",&taille);
-    fscanf(ifs,"%d",&orientation);
 
-    graphe->orientation=orientation;
-    graphe->ordre=ordre;
+    graphe->orientation=1;
+    graphe->ordre=nmb_operations;
 
     // créer les arêtes du graphe
     for (int i=0; i<taille; ++i)
@@ -105,10 +104,11 @@ Graphe * lire_graphe(char * nomFichier)
         fscanf(ifs,"%d%d",&s1,&s2);
         graphe->pSommet=CreerArete(graphe->pSommet, s1, s2);
 
-        if(!orientation)
-            graphe->pSommet=CreerArete(graphe->pSommet, s2, s1);
-    }
+        if(!orientation) {
+            graphe->pSommet = CreerArete(graphe->pSommet, s2, s1);
+        }
 
+    }
     return graphe;
 }
 
@@ -130,6 +130,59 @@ void graphe_afficher(Graphe* graphe)
     {
         afficher_successeurs(graphe->pSommet, i);
         printf("\n");
+    }
+
+}
+
+int *bfs(Graphe *g, int sdep, t_operation ** operations){
+    //création de la file et initialisation des couleurs et predecesseurs de chaques sommets
+    t_file *file = creer_file();
+    int rang = 1;
+    //initialisation de la couleur des sommets à 0 (non necessaire car j'ai ajouté une ligne dans le programme de la creation du graphe)
+    for(int i=0; i<g->ordre; i++){
+        g->pSommet[i]->couleur = 0;
+    }
+    //initialisation d'un tableau pour stocker le predecesseur de chaque sommet. -1 = pas de predecesseurs
+    int*pred;
+    pred = malloc(sizeof(int)*g->ordre);
+    for(int i=0; i<g->ordre; i++){
+        pred[i]=-1;
+    }
+    enfiler(file, sdep);//on enfile le sommet de depart pour pouvoir lancer la boucle
+    operations[sdep-1]->rang = 0;
+    g->pSommet[sdep]->couleur = 1;//une fois qu'on l'a vu on le marque
+    while(file->longueur != 0){//tant que la file n'est pas vide
+
+        //recuperation des sommets reliés à un autre inspiré du sous programme "afficher_successeurs"
+        int i = defiler(file);//on prend le prochain sommet de la file afin de le marquer et voir si il a des voisins non marqués
+        pArc arc = g->pSommet[i]->arc;
+        while(arc!=NULL){//tant que le sommet qu'on regarde à des voisins, on va les mettre dans la file si ils ne sont pas deja marqués
+            if(g->pSommet[arc->sommet]->couleur == 0) {
+                enfiler(file, arc->sommet);
+                g->pSommet[arc->sommet]->couleur = 1;
+                pred[arc->sommet] = i;
+            }
+            //operations[g->pSommet[i]->valeur]->rang = rang;
+            arc = arc->arc_suivant;
+        }
+        rang++;
+    }
+    //on retourne le tableau des predecesseur
+    return pred;
+
+}
+
+void afficher_pred(Graphe* g, int sdep, t_operation** operations){
+    //affichage des predecesseurs si il y en a
+    int *pred;
+    //recuperation des donnees avec le bfs
+    pred = bfs(g, sdep, operations);
+    for(int i =0; i<g->ordre; i++){
+        if(pred[i] == -1){
+            printf("predecesseur du sommet %d : pas de predecesseur\n", i);
+        }else {
+            printf("predecesseur du sommet %d : %d \n", i, pred[i]);
+        }
     }
 
 }

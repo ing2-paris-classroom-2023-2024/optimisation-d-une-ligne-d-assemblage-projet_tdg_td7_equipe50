@@ -41,6 +41,7 @@ t_operation **lire_operations(char * NomFichier, int *nmb_lignes){
     for(int i = 0; i< *nmb_lignes; i++){
         fscanf(ifs, "%d%f", &num, &temps);
         operation[i] = creer_operation(num, temps);
+        operation[i]->compteur = i;
     }
 
     fclose(ifs);
@@ -57,4 +58,29 @@ int compter_nombre_operations(FILE * fichier){
     }
     rewind(fichier);
     return nLignes;
+}
+
+FILE * creer_fichier_graphe(char* nomFichier, t_operation **operations, int *nmb_operations){
+    FILE * fichier = fopen(nomFichier, "r");
+    FILE * nouveau_fichier = fopen("nouveau_fichier.txt", "w+");
+    if(!fichier){
+        printf("erreur ouverture fichier");
+        exit(EXIT_FAILURE);
+    }
+    int s1, s2;
+    int nmb_lignes = compter_nombre_operations(fichier);
+    for(int i=0; i<nmb_lignes; i++){
+        fscanf(fichier, "%d%d",&s1,&s2);
+        for(int j=0; j<*nmb_operations; j++){
+            if(s1 == operations[j]->num){
+                fprintf(nouveau_fichier, "%d", operations[j]->compteur);
+            }
+        }
+        for(int k=0; k<*nmb_operations; k++){
+            if(s2 == operations[k]->num){
+                fprintf(nouveau_fichier, " %d\n", operations[k]->compteur);
+            }
+        }
+    }
+    return nouveau_fichier;
 }

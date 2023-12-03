@@ -10,4 +10,6 @@ add_executable(optimisation_d_une_ligne_d_assemblage_projet_tdg_td7_equipe50
         graphe.h
         graphe.c
         Stations.h
-        Stations.c)
+        Stations.c
+        file.c
+        file.h)
