@@ -12,4 +12,8 @@ add_executable(optimisation_d_une_ligne_d_assemblage_projet_tdg_td7_equipe50
         Stations.h
         Stations.c
         file.c
-        file.h)
+        file.h
+        precedence.c
+        precedence.h
+        precedence.c
+        precedence.h)
