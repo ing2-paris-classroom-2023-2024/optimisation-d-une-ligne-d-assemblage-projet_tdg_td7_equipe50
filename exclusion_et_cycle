@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
     typedef struct {
         int operation1;
         int operation2;
