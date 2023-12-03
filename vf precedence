@@ -10,7 +10,7 @@ typedef struct {
     int nombreNoeuds;
     Noeud** listeAdjacence;
 } Graphe;
-       blablabla
+ 
 Graphe* initialiserGraphe(int nombreNoeuds) {
     Graphe* graphe = (Graphe*)malloc(sizeof(Graphe));
     graphe->nombreNoeuds = nombreNoeuds;
