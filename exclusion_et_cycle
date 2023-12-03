@@ -40,17 +40,17 @@ void affecter_stations(int nb_contraintes, Contrainte contraintes[], int nb_stat
         // Trouver la station avec la charge minimale
         int min_charge_station = 0;
         for (int k = 1; k < nb_stations; k++) {
-                if (charge_station[k] < charge_station[min_charge_station]) {
-                    min_charge_station = k;
-                }
-            }
-
-            if (station_assignee[operation1 - 1] == 0 && station_assignee[operation2 - 1] == 0) {
-                // Affecter les opérations à la station avec la charge minimale
-                station_assignee[operation1 - 1] = station_assignee[operation2 - 1] = min_charge_station + 1;
-                charge_station[min_charge_station] += 2; // Deux opérations sont affectées
+            if (charge_station[k] < charge_station[min_charge_station]) {
+                min_charge_station = k;
             }
         }
+
+        if (station_assignee[operation1 - 1] == 0 && station_assignee[operation2 - 1] == 0) {
+            // Affecter les opérations à la station avec la charge minimale
+            station_assignee[operation1 - 1] = station_assignee[operation2 - 1] = min_charge_station + 1;
+            charge_station[min_charge_station] += 2; // Deux opérations sont affectées
+        }
+    }
 
         // Affichage de l'affectation des opérations aux stations
         for (int k = 0; k < nb_stations; k++) {
