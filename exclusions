@@ -1,4 +1,7 @@
-
+typedef struct t_noeud { /// struct représenter noeuds du graphe
+    int num_sommet;
+    struct t_noeud* suivant;
+}t_noeud;
 
 
 typedef struct t_graphe { /// struct représenter graphe
