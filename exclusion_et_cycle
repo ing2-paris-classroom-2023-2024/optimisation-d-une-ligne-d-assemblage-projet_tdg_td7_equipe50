@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-    typedef struct {
-        int operation1;
-        int operation2;
-    } Contrainte;
+typedef struct {
+    int operation1;
+    int operation2;
+} Contrainte;
 
     void lire_donnees(char* nom_fichier, int* nb_contraintes, Contrainte contraintes[]) {
         FILE *fichier = fopen(nom_fichier, "r");
