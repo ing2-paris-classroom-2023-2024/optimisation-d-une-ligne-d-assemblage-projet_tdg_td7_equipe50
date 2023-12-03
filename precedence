@@ -44,7 +44,6 @@ int compareDegrees(const void* a, const void* b) { /// F comparer  et trier deg 
     return b1->degree - a1->degree;
 }
 
-
 int couleurt_grapheWelshPowell(struct t_graphe* t_graphe) { /// F Welsh Powell
     struct t_degreeSommet degrees[t_graphe->tot_sommet];
     int totalStations = 0;
