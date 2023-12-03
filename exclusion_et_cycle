@@ -64,19 +64,19 @@ void affecter_stations(int nb_contraintes, Contrainte contraintes[], int nb_stat
     }
 }
 
-    int main() {
-        char nom_fichier[100];
-        int nb_contraintes;
+int main() {
+    char nom_fichier[100];
+    int nb_contraintes;
 
-        // Demander à l'utilisateur de saisir le nom du fichier
-        printf("Veuillez saisir le nom du fichier : ");
-        scanf("%s", nom_fichier);
+    // Demander à l'utilisateur de saisir le nom du fichier
+    printf("Veuillez saisir le nom du fichier : ");
+    scanf("%s", nom_fichier);
 
-        FILE *test_fichier = fopen(nom_fichier, "r");
-        if (test_fichier == NULL) {
-            printf("Le fichier %s n'a pas pu être ouvert.\n", nom_fichier);
-            return EXIT_FAILURE;
-        }
+    FILE *test_fichier = fopen(nom_fichier, "r");
+    if (test_fichier == NULL) {
+        printf("Le fichier %s n'a pas pu être ouvert.\n", nom_fichier);
+        return EXIT_FAILURE;
+    }
         fclose(test_fichier);
 
         printf("Veuillez saisir le nombre maximal d'opérations : ");
