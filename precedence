@@ -17,7 +17,6 @@ typedef struct t_degreeSommet {  ///struct deg des sommet
     int degree;
 }t_degreeSommet;
 
-
 struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le Graphe
 {
     struct t_noeud* nouveaut_noeud = malloc(sizeof(struct t_noeud));
