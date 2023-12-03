@@ -19,7 +19,6 @@ typedef struct t_stationSommet{ /// utiliser juste pour afficher tous les som pa
     struct t_stationSommet * suivant;
 }t_stationSommet ;
 
-
 struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le Graphe
 {
     struct t_noeud* nouveaut_noeud = malloc(sizeof(struct t_noeud));
