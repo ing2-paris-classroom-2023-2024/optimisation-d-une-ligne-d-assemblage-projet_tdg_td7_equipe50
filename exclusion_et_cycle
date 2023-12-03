@@ -6,12 +6,12 @@ typedef struct {
     int operation2;
 } Contrainte;
 
-    void lire_donnees(char* nom_fichier, int* nb_contraintes, Contrainte contraintes[]) {
-        FILE *fichier = fopen(nom_fichier, "r");
-        if (fichier == NULL) {
-            perror("Erreur lors de l'ouverture du fichier");
-            exit(EXIT_FAILURE);
-        }
+void lire_donnees(char* nom_fichier, int* nb_contraintes, Contrainte contraintes[]) {
+    FILE *fichier = fopen(nom_fichier, "r");
+    if (fichier == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
 
 
 
