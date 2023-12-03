@@ -17,27 +17,6 @@ typedef struct t_degreeSommet {  ///struct deg des sommet
     int degree;
 }t_degreeSommet;
 
-typedef struct t_stationSommet{ /// utiliser juste pour afficher tous les som par stations ( pour indication pas très utile)
-    int station;
-    int sommet2;
-    struct t_stationSommet * suivant;
-}t_stationSommet ;
-
-struct t_noeud* creerNoeud(int som);
-
-struct t_graphe* creerGraphe(int vertices);
-
-void ajouterArrete(struct t_graphe* t_graphe, int precedent, int destination);
-
-void calculateDegrees(struct t_graphe* t_graphe, struct t_degreeSommet degres[]);
-
-int compareDegrees(const void* a, const void* b);
-
-int couleurt_grapheWelshPowell(struct t_graphe* t_graphe);
-
-void ajouterSommetStation(struct t_stationSommet** liste, int station, int sommet);
-
-void afficherSommetsParStation(struct t_stationSommet* liste);
 
 struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le Graphe
 {
@@ -45,30 +24,6 @@ struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le G
     nouveaut_noeud->num_sommet = som;
     nouveaut_noeud->suivant = NULL;
     return nouveaut_noeud;
-}
-struct t_graphe* creerGraphe(int vertices) { /// F pour créer un Graph avec un certain nombre de sommets
-    struct t_graphe* t_graphe = malloc(sizeof(struct t_graphe));
-    t_graphe->tot_sommet = vertices;
-
-    t_graphe->tabloListeAdjacence = malloc(vertices * sizeof(struct t_noeud*));
-
-    for (int i = 0; i < vertices; i++) {
-        t_graphe->tabloListeAdjacence[i] = NULL;
-    }
-    return t_graphe;
-}
-
-void ajouterArrete(struct t_graphe* t_graphe, int precedent, int destination) { ///ajouter une arrête au graphe
-    precedent--; // Ajustement pour l'indexation à partir de 0
-    destination--;
-
-    struct t_noeud* nouveaut_noeud = creerNoeud(destination); ///Création d'1 nv nœud pour la liste d'adjacence du sommet précedent
-    nouveaut_noeud->suivant = t_graphe->tabloListeAdjacence[precedent];
-    t_graphe->tabloListeAdjacence[precedent] = nouveaut_noeud;
-
-    nouveaut_noeud = creerNoeud(precedent); ///Création d'1 nv nœud pour la liste d'adjacence du sommet destination
-    nouveaut_noeud->suivant = t_graphe->tabloListeAdjacence[destination];
-    t_graphe->tabloListeAdjacence[destination] = nouveaut_noeud;
 }
 
 void calculateDegrees(struct t_graphe* t_graphe, struct t_degreeSommet degres[]) { ///F calcul deg sommet graphe
@@ -89,21 +44,7 @@ int compareDegrees(const void* a, const void* b) { /// F comparer  et trier deg 
     struct t_degreeSommet* b1 = (struct t_degreeSommet*)b;
     return b1->degree - a1->degree;
 }
-/*
-void ajouterSommetStation(struct t_stationSommet ** liste, int station, int sommet) { ///F ajouter un som à la liste d'une station
-    struct t_stationSommet * nouveauSommet = malloc(sizeof(struct t_stationSommet));
-    nouveauSommet->station = station;
-    nouveauSommet->sommet2 = sommet;
-    nouveauSommet->suivant = *liste;
-    *liste = nouveauSommet;
-}
 
-void afficherSommetsParStation(struct t_stationSommet * liste) {
-    while (liste != NULL) {
-        printf("Station %d : Operation %d\n", liste->station + 1, liste->sommet2 + 1);
-        liste = liste->suivant;
-    }
-} */
 
 int couleurt_grapheWelshPowell(struct t_graphe* t_graphe) { /// F Welsh Powell
     struct t_degreeSommet degrees[t_graphe->tot_sommet];
@@ -124,13 +65,7 @@ int couleurt_grapheWelshPowell(struct t_graphe* t_graphe) { /// F Welsh Powell
         stations[i] = malloc(t_graphe->tot_sommet * sizeof(int));
     }
     int* stations2[totalStations];
-    for (int i = 0; i < totalStations; i++) {
-        stations[i] = malloc(t_graphe->tot_sommet * sizeof(int));
-        // Initialiser chaque élément du tableau à 0
-        for (int j = 0; j < t_graphe->tot_sommet; j++) {
-            stations[i][j] = 0;
-        }
-    }
+ 
 
     for (int i = 0; i < t_graphe->tot_sommet; i++) { ///attrib couleurs
         int coucou = degrees[i].num_sommet;
