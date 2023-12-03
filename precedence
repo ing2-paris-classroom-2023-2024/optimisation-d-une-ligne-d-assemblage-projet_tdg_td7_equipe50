@@ -1,134 +1,301 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-#define MAX_TASKS 100
+typedef struct t_noeud { /// struct représenter noeuds du graphe
+    int num_sommet;
+    struct t_noeud* suivant;
+}t_noeud;
 
-// Structure pour représenter un nœud du graphe
-typedef struct Node {
-    int task;
-    struct Node* next;
-} Node;
+typedef struct t_graphe { /// struct représenter graphe
+    int tot_sommet;
+    struct t_noeud** tabloListeAdjacence;
+}t_graphe;
 
-// Structure pour représenter le graphe
-typedef struct Graph {
-    int numTasks;
-    Node** adjacencyList;
-    int* inDegree;  // Nombre d'arêtes entrantes pour chaque nœud
-} Graph;
+typedef struct t_degreeSommet {  ///struct deg des sommet
+    int num_sommet;
+    int degree;
+}t_degreeSommet;
 
-// Fonction pour initialiser un nœud
-Node* createNode(int task) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->task = task;
-    newNode->next = NULL;
-    return newNode;
+struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le Graphe
+{
+    struct t_noeud* nouveaut_noeud = malloc(sizeof(struct t_noeud));
+    nouveaut_noeud->num_sommet = som;
+    nouveaut_noeud->suivant = NULL;
+    return nouveaut_noeud;
 }
 
-// Fonction pour initialiser le graphe
-Graph* initGraph(int numTasks) {
-    Graph* graph = (Graph*)malloc(sizeof(Graph));
-    graph->numTasks = numTasks;
-    graph->adjacencyList = (Node**)malloc(numTasks * sizeof(Node*));
-    graph->inDegree = (int*)calloc(numTasks, sizeof(int));
+void calculateDegrees(struct t_graphe* t_graphe, struct t_degreeSommet degres[]) { ///F calcul deg sommet graphe
+    for (int i = 0; i < t_graphe->tot_sommet; i++) {
+        struct t_noeud* temp = t_graphe->tabloListeAdjacence[i];
+        degres[i].num_sommet = i;
+        degres[i].degree = 0;
 
-    for (int i = 0; i < numTasks; ++i) {
-        graph->adjacencyList[i] = NULL;
+        while (temp) { /// Parcours de la liste d'adjacence pour chaque som
+            degres[i].degree++;
+            temp = temp->suivant;
+        }
     }
-
-    return graph;
 }
 
-// Fonction pour ajouter une arête au graphe
-void addEdge(Graph* graph, int fromTask, int toTask) {
-    Node* newNode = createNode(toTask);
-    newNode->next = graph->adjacencyList[fromTask];
-    graph->adjacencyList[fromTask] = newNode;
-    graph->inDegree[toTask]++;
+int compareDegrees(const void* a, const void* b) { /// F comparer  et trier deg sommets
+    struct t_degreeSommet* a1 = (struct t_degreeSommet*)a;
+    struct t_degreeSommet* b1 = (struct t_degreeSommet*)b;
+    return b1->degree - a1->degree;
 }
 
-// Fonction pour tri topologique
-void topologicalSort(Graph* graph) {
-    int* result = (int*)malloc(graph->numTasks * sizeof(int));
-    int resultIndex = 0;
 
-    // Initialiser une file pour les nœuds avec un degré entrant de 0
-    int* queue = (int*)malloc(graph->numTasks * sizeof(int));
-    int front = 0, rear = 0;
+int couleurt_grapheWelshPowell(struct t_graphe* t_graphe) { /// F Welsh Powell
+    struct t_degreeSommet degrees[t_graphe->tot_sommet];
+    int totalStations = 0;
+    calculateDegrees(t_graphe, degrees);
 
-    // Ajouter les nœuds avec un degré entrant de 0 à la file
-    for (int i = 0; i < graph->numTasks; ++i) {
-        if (graph->inDegree[i] == 0) {
-            queue[rear++] = i;
+    qsort(degrees, t_graphe->tot_sommet, sizeof(degrees[0]), compareDegrees);  /// Tri par deg décroi
+
+    int couleur[t_graphe->tot_sommet]; /// sotck couleur attribuées aux som
+    bool available[t_graphe->tot_sommet];
+
+    for (int i = 0; i < t_graphe->tot_sommet; i++) { ///tab des couleurs
+        couleur[i] = -1;
+        available[i] = true;
+    }
+    int* stations[t_graphe->tot_sommet];
+    for (int i = 0; i < t_graphe->tot_sommet; i++) {
+        stations[i] = malloc(t_graphe->tot_sommet * sizeof(int));
+    }
+    int* stations2[totalStations];
+ 
+
+    for (int i = 0; i < t_graphe->tot_sommet; i++) { ///attrib couleurs
+        int coucou = degrees[i].num_sommet;
+
+        struct t_noeud* temp = t_graphe->tabloListeAdjacence[coucou]; ///couleur en fonction des voisins
+        while (temp) {
+            if (couleur[temp->num_sommet] != -1) {
+                available[couleur[temp->num_sommet]] = false;
+            }
+            temp = temp->suivant;
+        }
+
+        int byebye; /// attrib couleur la plus basse
+        for (byebye = 0; byebye< t_graphe->tot_sommet; byebye++) {
+            if (available[byebye]) break;
+        }
+
+        couleur[coucou] = byebye;
+        stations2[byebye][coucou] = 1;
+        if (byebye >= totalStations) { ///nv couelur = nv station
+            totalStations = byebye + 1;
+        }
+
+        for (int j = 0; j < t_graphe->tot_sommet; j++) { ///nv couleur pro itération
+            available[j] = true;
         }
     }
 
-    // Appliquer le tri topologique
-    while (front < rear) {
-        int currentTask = queue[front++];
-        result[resultIndex++] = currentTask;
+    ///AFFICHAGE DE LA STATION PAR OPERATION
+    puts("");
+    puts("affichage des stations par operations");
+    puts("");
 
-        // Réduire le degré entrant des voisins
-        for (Node* neighbor = graph->adjacencyList[currentTask]; neighbor != NULL; neighbor = neighbor->next) {
-            graph->inDegree[neighbor->task]--;
-            if (graph->inDegree[neighbor->task] == 0) {
-                queue[rear++] = neighbor->task;
+    for (int u = 0; u < t_graphe->tot_sommet; u++) {
+        printf("L'operation %d est dans la station %d\n", u + 1, couleur[u] + 1);
+    }
+    ///AFFICHAGE DES OPERATIONS PAR STATION
+    puts("");
+    puts("affichage des operations par station");
+    puts("");
+    for (int s = 0; s < totalStations; s++) {
+        printf("Station %d : ", s + 1);
+        for (int i = 0; i < t_graphe->tot_sommet; i++) {
+            if (stations2[s][i] != 0) {
+                printf("%d ", stations[s][i] + 1);
             }
         }
+        printf("\n");
+    }
+    ///AFFICHAGE NBR TOT DE STATION
+    puts("");
+    puts("affichage du nombre total de station");
+    puts("");
+    printf("Nombre total de stations necessaires : %d\n", totalStations);
+
+    return totalStations;
+}
+
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud* suivant;
+} Noeud;
+
+typedef struct {
+    int nombreNoeuds;
+    Noeud** listeAdjacence;
+} Graphe;
+
+Graphe* initialiserGraphe(int nombreNoeuds) {
+    Graphe* graphe = (Graphe*)malloc(sizeof(Graphe));
+    graphe->nombreNoeuds = nombreNoeuds;
+    graphe->listeAdjacence = (Noeud**)malloc(nombreNoeuds * sizeof(Noeud*));
+
+    for (int i = 0; i < nombreNoeuds; ++i) {
+        graphe->listeAdjacence[i] = NULL;
     }
 
-    // Vérifier s'il y a un cycle (si tous les nœuds n'ont pas été inclus dans le tri topologique)
-    if (resultIndex != graph->numTasks) {
-        printf("Le graphe a un cycle. Il n'est pas possible de déterminer un ordre valide.\n");
-        free(result);
-        free(queue);
-        return;
+    return graphe;
+}
+
+void ajouterArete(Graphe* graphe, int source, int destination) {
+    Noeud* nouveauNoeud = (Noeud*)malloc(sizeof(Noeud));
+    nouveauNoeud->valeur = destination;
+    nouveauNoeud->suivant = graphe->listeAdjacence[source];
+    graphe->listeAdjacence[source] = nouveauNoeud;
+}
+
+void libererGraphe(Graphe* graphe) {
+    for (int i = 0; i < graphe->nombreNoeuds; ++i) {
+        Noeud* noeudCourant = graphe->listeAdjacence[i];
+        while (noeudCourant != NULL) {
+            Noeud* noeudSuivant = noeudCourant->suivant;
+            free(noeudCourant);
+            noeudCourant = noeudSuivant;
+        }
     }
 
-    // Afficher l'ordre des opérations
-    printf("Ordre des opérations (rangs) :\n");
-    for (int i = 0; i < graph->numTasks; ++i) {
-        printf("Opération %d : Rang %d\n", result[i] + 1, i + 1);
+    free(graphe->listeAdjacence);
+    free(graphe);
+}
+
+int trouverNombreNoeuds(FILE* fichier) {
+    int source, destination;
+    int maxNoeud = 0;
+
+    while (fscanf(fichier, "%d %d", &source, &destination) == 2) {
+        if (source > maxNoeud) {
+            maxNoeud = source;
+        }
+        if (destination > maxNoeud) {
+            maxNoeud = destination;
+        }
     }
 
-    // Libérer la mémoire
-    free(result);
-    free(queue);
+    return maxNoeud + 1;  // Ajouter 1 car les nœuds sont numérotés à partir de 0
+}
+
+
+void triTopologiqueRecursif(Graphe* graphe, int sommet, int* visite, int* rang, int* dernierRang) {
+    visite[sommet] = 1;
+
+    Noeud* voisin = graphe->listeAdjacence[sommet];
+    while (voisin != NULL) {
+        if (!visite[voisin->valeur]) {
+            triTopologiqueRecursif(graphe, voisin->valeur, visite, rang, dernierRang);
+        }
+        voisin = voisin->suivant;
+    }
+
+    rang[sommet] = (*dernierRang)--;
+}
+
+void triTopologique(Graphe* graphe, int* rang) {
+    int* visite = (int*)calloc(graphe->nombreNoeuds, sizeof(int));
+    int dernierRang = graphe->nombreNoeuds;
+
+    for (int i = 0; i < graphe->nombreNoeuds; ++i) {
+        if (!visite[i]) {
+            triTopologiqueRecursif(graphe, i, visite, rang, &dernierRang);
+        }
+    }
+
+    free(visite);
+}
+
+void afficherGraphe(Graphe* graphe,int *rang) {
+    for (int i = 1; i < graphe->nombreNoeuds; ++i) {
+        Noeud* noeudCourant = graphe->listeAdjacence[i];
+        printf("Noeud %d:", i);
+
+        while (noeudCourant != NULL) {
+            printf(" -> %d", noeudCourant->valeur);
+            noeudCourant = noeudCourant->suivant;
+        }
+        printf("    /Rang %d",rang[i]);
+        printf("\n");
+    }
+}
+
+void genererStations(Graphe* graphe, int* rang) {
+    int maxRang = graphe->nombreNoeuds;
+
+    // Créer des tableaux pour stocker les opérations de chaque station
+    int** stations = (int**)malloc(maxRang * sizeof(int*));
+    for (int i = 0; i < maxRang; ++i) {
+        stations[i] = (int*)malloc(graphe->nombreNoeuds * sizeof(int));
+        for (int j = 0; j < graphe->nombreNoeuds; ++j) {
+            stations[i][j] = -1;  // Initialiser à -1 (pas d'opération)
+        }
+    }
+
+    // Remplir les tableaux de stations en fonction des rangs
+    for (int i = 1; i < graphe->nombreNoeuds; ++i) {
+        int stationIndex = maxRang - rang[i];
+        int j = 0;
+
+        while (stations[stationIndex][j] != -1) {
+            ++j;
+        }
+
+        stations[stationIndex][j] = i;
+    }
+
+    // Afficher les stations
+    for (int i = 0; i < maxRang; ++i) {
+        printf("Station %d:", i);
+        for (int j = 0; j < graphe->nombreNoeuds && stations[i][j] != -1; ++j) {
+            printf(" -> %d", stations[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Libérer la mémoire allouée pour les tableaux de stations
+    for (int i = 0; i < maxRang; ++i) {
+        free(stations[i]);
+    }
+    free(stations);
 }
 
 int main() {
-    FILE* file = fopen("contraintes_precedence.txt", "r");
-    if (!file) {
-        perror("Erreur lors de l'ouverture du fichier");
+    FILE *fichier = fopen("precedences.txt", "r");
+
+    if (fichier == NULL) {
+        fprintf(stderr, "Impossible d'ouvrir le fichier.\n");
         return 1;
     }
 
-    int numTasks;
-    fscanf(file, "%d", &numTasks);
+    int nombreTotalNoeuds = trouverNombreNoeuds(fichier);
 
-    Graph* graph = initGraph(numTasks);
+    // Réinitialiser le curseur du fichier pour lire à partir du début
+    fseek(fichier, 0, SEEK_SET);
 
-    int fromTask, toTask;
-    while (fscanf(file, "%d %d", &fromTask, &toTask) == 2) {
-        addEdge(graph, fromTask - 1, toTask - 1);
+    Graphe* graphe = initialiserGraphe(nombreTotalNoeuds);
+
+    int source, destination;
+    while (fscanf(fichier, "%d %d", &source, &destination) == 2) {
+        ajouterArete(graphe, source, destination);
     }
 
-    fclose(file);
+    fclose(fichier);
 
-    // Appliquer le tri topologique et afficher les rangs
-    topologicalSort(graph);
+    int* rang = (int*)malloc(nombreTotalNoeuds * sizeof(int));
+    triTopologique(graphe, rang);
 
-    // Libérer la mémoire
-    for (int i = 0; i < numTasks; ++i) {
-        Node* current = graph->adjacencyList[i];
-        while (current != NULL) {
-            Node* next = current->next;
-            free(current);
-            current = next;
-        }
-    }
-    free(graph->adjacencyList);
-    free(graph->inDegree);
-    free(graph);
+    couleurt_grapheWelshPowell(graphe);
+    // Afficher le rang de chaque opération
+    afficherGraphe(graphe,rang);
+    genererStations(graphe, rang);
+    free(rang);
+    libererGraphe(graphe);
 
     return 0;
 }
