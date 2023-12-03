@@ -38,15 +38,6 @@ int main(){
     printf("numero du sommet initial : \n");
     scanf("%d", &sommet_init);
     afficher_pred(g, sommet_init, operations);
-    /*
-    for(int i=0; i<nmb_lignes; i++){
-        printf("operations %d : rang %d", operations[i]->num, operations[i]->rang);
-    }
-    */
-    for(int i = 0; i<nmb_lignes; i++){
-        printf("operation %d : rang %d\n", operations[i]->num, operations[i]->rang);
-    }
-    enfiler_operations(operations, nmb_lignes);
     for (int i = 0; i < nmb_lignes; i++) {
         free(operations[i]);
     }
