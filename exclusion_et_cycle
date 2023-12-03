@@ -20,27 +20,26 @@ void lire_donnees(char* nom_fichier, int* nb_contraintes, Contrainte contraintes
     fclose(fichier);
 }
 
-    void affecter_stations(int nb_contraintes, Contrainte contraintes[], int nb_stations, int max_operations) {
-        int station_assignee[max_operations];
-        int charge_station[nb_stations];
+void affecter_stations(int nb_contraintes, Contrainte contraintes[], int nb_stations, int max_operations) {
+    int station_assignee[max_operations];
+    int charge_station[nb_stations];
+    for (int i = 0; i < max_operations; i++) {
+        station_assignee[i] = 0;
+    }
 
-        for (int i = 0; i < max_operations; i++) {
-            station_assignee[i] = 0;
-        }
+    // Initialiser la charge de chaque station à zéro
+    for (int k = 0; k < nb_stations; k++) {
+        charge_station[k] = 0;
+    }
 
-        // Initialiser la charge de chaque station à zéro
-        for (int k = 0; k < nb_stations; k++) {
-            charge_station[k] = 0;
-        }
+    // Affecter les opérations aux stations en équilibrant la charge
+    for (int i = 0; i < nb_contraintes; i++) {
+        int operation1 = contraintes[i].operation1;
+        int operation2 = contraintes[i].operation2;
 
-        // Affecter les opérations aux stations en équilibrant la charge
-        for (int i = 0; i < nb_contraintes; i++) {
-            int operation1 = contraintes[i].operation1;
-            int operation2 = contraintes[i].operation2;
-
-            // Trouver la station avec la charge minimale
-            int min_charge_station = 0;
-            for (int k = 1; k < nb_stations; k++) {
+        // Trouver la station avec la charge minimale
+        int min_charge_station = 0;
+        for (int k = 1; k < nb_stations; k++) {
                 if (charge_station[k] < charge_station[min_charge_station]) {
                     min_charge_station = k;
                 }
