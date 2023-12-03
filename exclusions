@@ -1,0 +1,171 @@
+typedef struct t_noeud { /// struct représenter noeuds du graphe
+    int num_sommet;
+    struct t_noeud* suivant;
+}t_noeud;
+
+typedef struct t_graphe { /// struct représenter graphe
+    int tot_sommet;
+    struct t_noeud** tabloListeAdjacence;
+}t_graphe;
+
+typedef struct t_degreeSommet {  ///struct deg des sommet
+    int num_sommet;
+    int degree;
+}t_degreeSommet;
+
+typedef struct t_stationSommet{ /// utiliser juste pour afficher tous les som par stations ( pour indication pas très utile)
+    int station;
+    int sommet2;
+    struct t_stationSommet * suivant;
+}t_stationSommet ;
+
+
+struct t_noeud* creerNoeud(int som) /// F pour créer un nouveau nœud dans le Graphe
+{
+    struct t_noeud* nouveaut_noeud = malloc(sizeof(struct t_noeud));
+    nouveaut_noeud->num_sommet = som;
+    nouveaut_noeud->suivant = NULL;
+    return nouveaut_noeud;
+}
+struct t_graphe* creerGraphe(int vertices) { /// F pour créer un Graph avec un certain nombre de sommets
+    struct t_graphe* t_graphe = malloc(sizeof(struct t_graphe));
+    t_graphe->tot_sommet = vertices;
+
+    t_graphe->tabloListeAdjacence = malloc(vertices * sizeof(struct t_noeud*));
+
+    for (int i = 0; i < vertices; i++) {
+        t_graphe->tabloListeAdjacence[i] = NULL;
+    }
+    return t_graphe;
+}
+
+void ajouterArrete(struct t_graphe* t_graphe, int precedent, int destination) { ///ajouter une arrête au graphe
+    precedent--; // Ajustement pour l'indexation à partir de 0
+    destination--;
+
+    struct t_noeud* nouveaut_noeud = creerNoeud(destination); ///Création d'1 nv nœud pour la liste d'adjacence du sommet précedent
+    nouveaut_noeud->suivant = t_graphe->tabloListeAdjacence[precedent];
+    t_graphe->tabloListeAdjacence[precedent] = nouveaut_noeud;
+
+    nouveaut_noeud = creerNoeud(precedent); ///Création d'1 nv nœud pour la liste d'adjacence du sommet destination
+    nouveaut_noeud->suivant = t_graphe->tabloListeAdjacence[destination];
+    t_graphe->tabloListeAdjacence[destination] = nouveaut_noeud;
+}
+
+void calculateDegrees(struct t_graphe* t_graphe, struct t_degreeSommet degres[]) { ///F calcul deg sommet graphe
+    for (int i = 0; i < t_graphe->tot_sommet; i++) {
+        struct t_noeud* temp = t_graphe->tabloListeAdjacence[i];
+        degres[i].num_sommet = i;
+        degres[i].degree = 0;
+
+        while (temp) { /// Parcours de la liste d'adjacence pour chaque som
+            degres[i].degree++;
+            temp = temp->suivant;
+        }
+    }
+}
+
+int compareDegrees(const void* a, const void* b) { /// F comparer  et trier deg sommets
+    struct t_degreeSommet* a1 = (struct t_degreeSommet*)a;
+    struct t_degreeSommet* b1 = (struct t_degreeSommet*)b;
+    return b1->degree - a1->degree;
+}
+/*
+void ajouterSommetStation(struct t_stationSommet ** liste, int station, int sommet) { ///F ajouter un som à la liste d'une station
+    struct t_stationSommet * nouveauSommet = malloc(sizeof(struct t_stationSommet));
+    nouveauSommet->station = station;
+    nouveauSommet->sommet2 = sommet;
+    nouveauSommet->suivant = *liste;
+    *liste = nouveauSommet;
+}
+
+void afficherSommetsParStation(struct t_stationSommet * liste) {
+    while (liste != NULL) {
+        printf("Station %d : Operation %d\n", liste->station + 1, liste->sommet2 + 1);
+        liste = liste->suivant;
+    }
+} */
+
+int couleurt_grapheWelshPowell(struct t_graphe* t_graphe) { /// F Welsh Powell
+    struct t_degreeSommet degrees[t_graphe->tot_sommet];
+    int totalStations = 0;
+    calculateDegrees(t_graphe, degrees);
+
+    qsort(degrees, t_graphe->tot_sommet, sizeof(degrees[0]), compareDegrees);  /// Tri par deg décroi
+
+    int couleur[t_graphe->tot_sommet]; /// sotck couleur attribuées aux som
+    bool available[t_graphe->tot_sommet];
+
+    for (int i = 0; i < t_graphe->tot_sommet; i++) { ///tab des couleurs
+        couleur[i] = -1;
+        available[i] = true;
+    }
+    int* stations[t_graphe->tot_sommet];
+    for (int i = 0; i < t_graphe->tot_sommet; i++) {
+        stations[i] = malloc(t_graphe->tot_sommet * sizeof(int));
+    }
+    int* stations2[totalStations];
+    for (int i = 0; i < totalStations; i++) {
+        stations[i] = malloc(t_graphe->tot_sommet * sizeof(int));
+        // Initialiser chaque élément du tableau à 0
+        for (int j = 0; j < t_graphe->tot_sommet; j++) {
+            stations[i][j] = 0;
+        }
+    }
+
+    for (int i = 0; i < t_graphe->tot_sommet; i++) { ///attrib couleurs
+        int coucou = degrees[i].num_sommet;
+
+        struct t_noeud* temp = t_graphe->tabloListeAdjacence[coucou]; ///couleur en fonction des voisins
+        while (temp) {
+            if (couleur[temp->num_sommet] != -1) {
+                available[couleur[temp->num_sommet]] = false;
+            }
+            temp = temp->suivant;
+        }
+
+        int byebye; /// attrib couleur la plus basse
+        for (byebye = 0; byebye< t_graphe->tot_sommet; byebye++) {
+            if (available[byebye]) break;
+        }
+
+        couleur[coucou] = byebye;
+        stations2[byebye][coucou] = 1;
+        if (byebye >= totalStations) { ///nv couelur = nv station
+            totalStations = byebye + 1;
+        }
+
+        for (int j = 0; j < t_graphe->tot_sommet; j++) { ///nv couleur pro itération
+            available[j] = true;
+        }
+    }
+
+    ///AFFICHAGE DE LA STATION PAR OPERATION
+    puts("");
+    puts("affichage des stations par operations");
+    puts("");
+
+    for (int u = 0; u < t_graphe->tot_sommet; u++) {
+        printf("L'operation %d est dans la station %d\n", u + 1, couleur[u] + 1);
+    }
+    ///AFFICHAGE DES OPERATIONS PAR STATION
+    puts("");
+    puts("affichage des operations par station");
+    puts("");
+    for (int s = 0; s < totalStations; s++) {
+        printf("Station %d : ", s + 1);
+        for (int i = 0; i < t_graphe->tot_sommet; i++) {
+            if (stations2[s][i] != 0) {
+                printf("%d ", stations[s][i] + 1);
+            }
+        }
+        printf("\n");
+    }
+    ///AFFICHAGE NBR TOT DE STATION
+    puts("");
+    puts("affichage du nombre total de station");
+    puts("");
+    printf("Nombre total de stations necessaires : %d\n", totalStations);
+
+    return totalStations;
+}
