@@ -5,7 +5,7 @@ typedef struct Noeud {
     int valeur;
     struct Noeud* suivant;
 } Noeud;
- 
+    
 typedef struct {
     int nombreNoeuds;
     Noeud** listeAdjacence;
