@@ -63,3 +63,46 @@ int defiler(t_file *f){
     free(maillon);
     return num;
 }
+
+t_file_ope *creer_file_ope(){
+    t_file_ope *file = malloc(sizeof(t_file_ope));
+    file->tete = file->queue = NULL;
+    return file;
+}
+
+void enfiler_ope(t_file_ope * file, t_operation * operation) {
+    if (file->queue == NULL) {
+        file->tete = file->queue = operation;
+    } else {
+        file->queue->suivant = operation;
+        file->queue = operation;
+    }
+    operation->suivant = NULL;
+}
+
+t_operation * defiler_ope(t_file_ope * file) {
+    if (file->tete == NULL) return NULL;
+    t_operation * operation = file->tete;
+    file->tete = file->tete->suivant;
+    if (file->tete == NULL) {
+        file->queue = NULL;
+    }
+    operation->suivant = NULL; // Détacher l'opération de la file
+    return operation;
+}
+
+void libererFile(t_file_ope * file) {
+    while (file->tete != NULL) {
+        t_operation* temp = defiler_ope(file);
+        free(temp);
+    }
+    free(file);
+}
+
+void afficherFile(t_file_ope * file) {
+    t_operation * ope = file->tete;
+    while (ope != NULL) {
+        printf("Operation %d de rang %d\n", ope->num, ope->rang);
+        ope = ope->suivant;
+    }
+}
