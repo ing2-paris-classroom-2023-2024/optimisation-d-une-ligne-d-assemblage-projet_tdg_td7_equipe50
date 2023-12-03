@@ -2,6 +2,7 @@
 // Created by leopo on 25/11/2023.
 //
 #include "lecture_contraintes.h"
+#include "file.h"
 
 int lecture_temps(char* fichier){
     FILE * ifs = fopen(fichier, "r");
@@ -83,4 +84,40 @@ FILE * creer_fichier_graphe(char* nomFichier, t_operation **operations, int *nmb
         }
     }
     return nouveau_fichier;
+}
+
+void enfiler_operations(t_operation ** operations, int nmb_operation){
+    t_file_ope **file_rang = calloc(8, sizeof(t_file_ope*));
+    for(int i=0; i<=7; i++){
+        file_rang[i] = creer_file_ope();
+    }
+    for(int i =0; i<nmb_operation; i++){
+        enfiler_ope(file_rang[operations[i]->rang], operations[i]);
+    }
+    t_file_ope * file_finale = creer_file_ope();
+    for (int i = 0; i <= 7; i++) {
+        while (file_rang[i]->tete != NULL) {
+            enfiler(file_finale, defiler(file_rang[i]));
+        }
+        libererFile(file_rang[i]);
+    }
+    free(file_rang);
+
+    // Afficher la file finale
+    afficherFile(file_finale);
+    libererFile(file_finale);
+}
+
+int exclusion(int s1, int s2, char *Fichier){
+    FILE * fichier = fopen(Fichier, "r");
+    int nmb_lignes = compter_nombre_operations(fichier);
+    int ope1 = -1, ope2 = -1;
+    rewind(fichier);
+    for(int i =0; i<nmb_lignes; i++){
+        fscanf(fichier, "%d%d", &ope1, &ope2);
+        if((s1 == ope1 && s2 == ope2) || (s1 == ope2 && s2 == ope1)){
+            return 1;
+        }
+    }
+    return 0;
 }

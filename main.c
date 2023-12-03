@@ -8,6 +8,10 @@
 #include "lecture_contraintes.h"
 #include "file.h"
 
+void assigner_stations(t_operation ** operations, int *nmb_operations, int temps_total){
+
+}
+
 int main(){
     char nomFichier[50];
     char precedence[50];
@@ -42,6 +46,7 @@ int main(){
     for(int i = 0; i<nmb_lignes; i++){
         printf("operation %d : rang %d\n", operations[i]->num, operations[i]->rang);
     }
+    enfiler_operations(operations, nmb_lignes);
     for (int i = 0; i < nmb_lignes; i++) {
         free(operations[i]);
     }
