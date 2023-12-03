@@ -12,17 +12,13 @@ void lire_donnees(char* nom_fichier, int* nb_contraintes, Contrainte contraintes
         perror("Erreur lors de l'ouverture du fichier");
         exit(EXIT_FAILURE);
     }
-
-
-
-        // Lire les contraintes du fichier
-        *nb_contraintes = 0;
-        while (fscanf(fichier, "%d %d", &contraintes[*nb_contraintes].operation1, &contraintes[*nb_contraintes].operation2) == 2) {
-            (*nb_contraintes)++;
-        }
-
-        fclose(fichier);
+    // Lire les contraintes du fichier
+    *nb_contraintes = 0;
+    while (fscanf(fichier, "%d %d", &contraintes[*nb_contraintes].operation1, &contraintes[*nb_contraintes].operation2) == 2) {
+        (*nb_contraintes)++;
     }
+    fclose(fichier);
+}
 
     void affecter_stations(int nb_contraintes, Contrainte contraintes[], int nb_stations, int max_operations) {
         int station_assignee[max_operations];
