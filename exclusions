@@ -3,7 +3,6 @@ typedef struct t_noeud { /// struct représenter noeuds du graphe
     struct t_noeud* suivant;
 }t_noeud;
 
-
 typedef struct t_graphe { /// struct représenter graphe
     int tot_sommet;
     struct t_noeud** tabloListeAdjacence;
