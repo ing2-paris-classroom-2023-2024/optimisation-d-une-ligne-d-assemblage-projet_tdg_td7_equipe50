@@ -77,23 +77,23 @@ int main() {
         printf("Le fichier %s n'a pas pu être ouvert.\n", nom_fichier);
         return EXIT_FAILURE;
     }
-        fclose(test_fichier);
+    fclose(test_fichier);
 
-        printf("Veuillez saisir le nombre maximal d'opérations : ");
-        int max_operations;
-        scanf("%d", &max_operations);
+    printf("Veuillez saisir le nombre maximal d'opérations : ");
+    int max_operations;
+    scanf("%d", &max_operations);
 
-        Contrainte contraintes[max_operations];
-        lire_donnees(nom_fichier, &nb_contraintes, contraintes);
+    Contrainte contraintes[max_operations];
+    lire_donnees(nom_fichier, &nb_contraintes, contraintes);
 
-        if (nb_contraintes == 0) {
-            printf("Erreur : Aucune contrainte n'a été lue dans le fichier %s.\n", nom_fichier);
-            return EXIT_FAILURE;
-        }
+    if (nb_contraintes == 0) {
+        printf("Erreur : Aucune contrainte n'a été lue dans le fichier %s.\n", nom_fichier);
+        return EXIT_FAILURE;
+    }
 
-        int nb_stations = 5;
+    int nb_stations = 5;
 
-        affecter_stations(nb_contraintes, contraintes, nb_stations, max_operations);
+    affecter_stations(nb_contraintes, contraintes, nb_stations, max_operations);
 
-        return 0;
-    }
+    return 0;
+}
