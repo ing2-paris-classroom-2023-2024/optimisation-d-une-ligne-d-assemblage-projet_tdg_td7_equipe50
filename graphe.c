@@ -137,7 +137,12 @@ void graphe_afficher(Graphe* graphe)
 int *bfs(Graphe *g, int sdep, t_operation ** operations){
     //création de la file et initialisation des couleurs et predecesseurs de chaques sommets
     t_file *file = creer_file();
-    int rang = 1;
+    int* niveau = malloc(sizeof(int) * g->ordre);
+
+    // Initialisation des niveaux à -1 (inconnu)
+    for (int i = 0; i < g->ordre; i++) {
+        niveau[i] = -1;
+    }
     //initialisation de la couleur des sommets à 0 (non necessaire car j'ai ajouté une ligne dans le programme de la creation du graphe)
     for(int i=0; i<g->ordre; i++){
         g->pSommet[i]->couleur = 0;
@@ -149,7 +154,7 @@ int *bfs(Graphe *g, int sdep, t_operation ** operations){
         pred[i]=-1;
     }
     enfiler(file, sdep);//on enfile le sommet de depart pour pouvoir lancer la boucle
-    operations[sdep-1]->rang = 0;
+    niveau[sdep] = 0;
     g->pSommet[sdep]->couleur = 1;//une fois qu'on l'a vu on le marque
     while(file->longueur != 0){//tant que la file n'est pas vide
 
@@ -157,15 +162,16 @@ int *bfs(Graphe *g, int sdep, t_operation ** operations){
         int i = defiler(file);//on prend le prochain sommet de la file afin de le marquer et voir si il a des voisins non marqués
         pArc arc = g->pSommet[i]->arc;
         while(arc!=NULL){//tant que le sommet qu'on regarde à des voisins, on va les mettre dans la file si ils ne sont pas deja marqués
-            if(g->pSommet[arc->sommet]->couleur == 0) {
+            if (g->pSommet[arc->sommet]->couleur == 0) {
                 enfiler(file, arc->sommet);
                 g->pSommet[arc->sommet]->couleur = 1;
                 pred[arc->sommet] = i;
+                niveau[arc->sommet] = niveau[i] + 1; // Définir le niveau ici
+                operations[arc->sommet]->rang = niveau[arc->sommet]; // Assigner le rang
             }
             //operations[g->pSommet[i]->valeur]->rang = rang;
             arc = arc->arc_suivant;
         }
-        rang++;
     }
     //on retourne le tableau des predecesseur
     return pred;
@@ -179,10 +185,11 @@ void afficher_pred(Graphe* g, int sdep, t_operation** operations){
     pred = bfs(g, sdep, operations);
     for(int i =0; i<g->ordre; i++){
         if(pred[i] == -1){
-            printf("predecesseur du sommet %d : pas de predecesseur\n", i);
+            printf("predecesseur du sommet %d : pas de predecesseur\n", operations[i]->num);
         }else {
-            printf("predecesseur du sommet %d : %d \n", i, pred[i]);
+            printf("predecesseur du sommet %d : %d \n", operations[i]->num, pred[i]);
         }
     }
+    printf("%d", operations[15]->num);
 
 }

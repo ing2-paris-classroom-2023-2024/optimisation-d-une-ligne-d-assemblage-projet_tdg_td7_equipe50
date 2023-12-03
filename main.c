@@ -24,9 +24,7 @@ int main(){
     for(int i = 0; i<nmb_lignes; i++){
         printf("%d %f\n", operations[i]->num, operations[i]->temps);
     }
-    for (int i = 0; i < nmb_lignes; i++) {
-        free(operations[i]);
-    }
+
     printf("Entrez le nom du fichier: ");
     fgets(precedence, sizeof(precedence), stdin);
     precedence[strcspn(precedence, "\n")] = 0;
@@ -41,6 +39,12 @@ int main(){
         printf("operations %d : rang %d", operations[i]->num, operations[i]->rang);
     }
     */
+    for(int i = 0; i<nmb_lignes; i++){
+        printf("operation %d : rang %d\n", operations[i]->num, operations[i]->rang);
+    }
+    for (int i = 0; i < nmb_lignes; i++) {
+        free(operations[i]);
+    }
     free(operations);
     return 0;
 }
