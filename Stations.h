@@ -16,6 +16,9 @@ typedef struct Station{
 }t_station;
 
 t_station *creer_station();
-t_station** assigner_stations(t_operation** tab_operations, int* nmb_operations);
+
+void trier_operations_par_rang(t_operation** operations, int nmb_operations);
+
+void assigner_stations(t_operation** tab_operations, int nmb_operations, FILE * fichier_exclusion, FILE * fichier_temps);
 
 #endif //OPTIMISATION_D_UNE_LIGNE_D_ASSEMBLAGE_PROJET_TDG_TD7_EQUIPE50_STATIONS_H

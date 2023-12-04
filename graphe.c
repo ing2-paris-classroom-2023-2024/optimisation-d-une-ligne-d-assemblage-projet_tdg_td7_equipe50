@@ -190,6 +190,4 @@ void afficher_pred(Graphe* g, int sdep, t_operation** operations){
             printf("predecesseur du sommet %d : %d \n", operations[i]->num, pred[i]);
         }
     }
-    printf("%d", operations[15]->num);
-
 }
