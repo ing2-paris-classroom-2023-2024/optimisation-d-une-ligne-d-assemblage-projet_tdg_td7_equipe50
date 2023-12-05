@@ -13,7 +13,6 @@ typedef struct t_degreeSommet {  ///struct deg des sommet
     int degree;
 }t_degreeSommet;
 
-
 typedef struct t_stationSommet{ /// utiliser juste pour afficher tous les som par stations ( pour indication pas très utile)
     int station;
     int sommet2;
