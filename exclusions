@@ -8,6 +8,7 @@ typedef struct t_graphe { /// struct représenter graphe
     struct t_noeud** tabloListeAdjacence;
 }t_graphe;
 
+
 typedef struct t_degreeSommet {  ///struct deg des sommet
     int num_sommet;
     int degree;
